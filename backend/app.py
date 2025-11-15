@@ -2,6 +2,7 @@ import os
 import tempfile
 
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
@@ -14,6 +15,14 @@ class CleanRequest(BaseModel):
 
 
 app = FastAPI(title="transcribe-mate")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/api/system-prompt")
