@@ -14,7 +14,6 @@ import { BACKEND_URL } from "@/lib/config";
 export default function Home() {
   const [transcript, setTranscript] = useState("");
   const [cleanedTranscript, setCleanedTranscript] = useState("");
-  const [showCleaned, setShowCleaned] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [isCleaning, setIsCleaning] = useState(false);
   const [error, setError] = useState("");
@@ -22,7 +21,6 @@ export default function Home() {
   const handleTranscript = (text: string) => {
     setTranscript(text);
     setCleanedTranscript("");
-    setShowCleaned(false);
     setError("");
   };
 
@@ -59,7 +57,6 @@ export default function Home() {
 
       const data = await response.json();
       setCleanedTranscript(data.cleaned);
-      setShowCleaned(true);
     } catch (err) {
       setError("Failed to clean transcript");
       console.error(err);
@@ -68,7 +65,6 @@ export default function Home() {
     }
   };
 
-  const displayText = showCleaned ? cleanedTranscript : transcript;
   const isDisabled = isTranscribing || isCleaning;
 
   return (
@@ -107,12 +103,8 @@ export default function Home() {
           <div className="lg:col-span-2 space-y-4">
             {transcript && (
               <>
-                <TextDisplay
-                  text={displayText}
-                  isCleanedVersion={showCleaned}
-                  originalExists={cleanedTranscript !== ""}
-                  onToggleVersion={() => setShowCleaned(!showCleaned)}
-                />
+                {/* Original Transcript */}
+                <TextDisplay text={transcript} label="Original Transcript" />
 
                 <Button
                   onClick={() => handleClean()}
@@ -128,6 +120,15 @@ export default function Home() {
                   isLoading={isCleaning}
                   isDisabled={isDisabled}
                 />
+
+                {/* Cleaned Transcript - appears after cleaning */}
+                {cleanedTranscript && (
+                  <TextDisplay
+                    text={cleanedTranscript}
+                    label="Cleaned Transcript"
+                    isPrimary={false}
+                  />
+                )}
               </>
             )}
 

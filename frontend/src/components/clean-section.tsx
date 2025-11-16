@@ -1,6 +1,6 @@
 "use client";
 
-import { Wand2 } from "lucide-react";
+import { Wand2, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -27,24 +27,43 @@ export default function CleanSection({
     }
   };
 
+  const handleCancel = () => {
+    setShowCustom(false);
+    setCustomPrompt("");
+  };
+
   return (
     <Card className="bg-slate-800 border-slate-700 p-4">
-      <div className="flex items-center gap-2 mb-3">
-        <Wand2 className="w-4 h-4 text-orange-400" />
-        <h3 className="text-white font-semibold">Custom Cleaning Prompt</h3>
-      </div>
-
       {!showCustom ? (
-        <Button
-          onClick={() => setShowCustom(true)}
-          disabled={isLoading || isDisabled}
-          variant="outline"
-          className="w-full border-slate-600 text-slate-300 hover:bg-slate-700 disabled:opacity-50"
-        >
-          Add Custom Prompt
-        </Button>
+        <>
+          <div className="flex items-center gap-2 mb-3">
+            <Wand2 className="w-4 h-4 text-orange-400" />
+            <h3 className="text-white font-semibold">Custom Cleaning Prompt</h3>
+          </div>
+          <Button
+            onClick={() => setShowCustom(true)}
+            disabled={isLoading || isDisabled}
+            className="w-full bg-orange-600 hover:bg-orange-700 text-white disabled:opacity-50"
+          >
+            Add Custom Prompt
+          </Button>
+        </>
       ) : (
         <>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-white font-semibold flex items-center gap-2">
+              <Wand2 className="w-4 h-4 text-orange-400" />
+              Custom Cleaning Prompt
+            </h3>
+            <Button
+              onClick={handleCancel}
+              size="sm"
+              variant="ghost"
+              className="text-slate-400 hover:text-white hover:bg-slate-700"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
           <textarea
             value={customPrompt}
             onChange={(e) => setCustomPrompt(e.target.value)}
@@ -61,13 +80,9 @@ export default function CleanSection({
               Clean with Prompt
             </Button>
             <Button
-              onClick={() => {
-                setShowCustom(false);
-                setCustomPrompt("");
-              }}
+              onClick={handleCancel}
               disabled={isLoading || isDisabled}
-              variant="outline"
-              className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-700 disabled:opacity-50"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
             >
               Cancel
             </Button>
