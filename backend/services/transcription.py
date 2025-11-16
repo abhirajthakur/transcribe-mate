@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
+from faster_whisper import WhisperModel
 from google import genai
 from google.genai import types
 
@@ -13,11 +14,10 @@ load_dotenv()
 
 
 class TranscriptionService:
-    def __init__(self, gemini_api_key: str, gemini_model: str):
-        print(f"Loading gemini with model '{gemini_model}'...")
+    def __init__(self, gemini_api_key: str, gemini_model: str, whisper_model: str):
         self.client = genai.Client(api_key=gemini_api_key)
         self.model = gemini_model
-        print(f"gemini '{gemini_model}' loaded!")
+        self.whisper = WhisperModel(whisper_model, device="auto", compute_type="int16")
 
         try:
             self.client.models.list()
@@ -27,13 +27,16 @@ class TranscriptionService:
 
     def transcribe(self, audio_file: str):
         print("Transcribing...")
-        file = self.client.files.upload(file=audio_file)
-        prompt = "Generate a transcript of the speech."
+        segments, info = self.whisper.transcribe(audio_file, beam_size=5, language="en")
 
-        response = self.client.models.generate_content(
-            model=self.model, contents=[prompt, file]
+        print(
+            "Detected language '%s' with probability %f"
+            % (info.language, info.language_probability)
         )
-        return response.text
+
+        text = " ".join([segment.text for segment in segments]).strip()
+
+        return text
 
     def get_default_system_prompt(self):
         return SYSTEM_PROMPT
@@ -57,6 +60,7 @@ class TranscriptionService:
             if response.text:
                 return response.text
 
+            print("Cleaned with LLM!!")
             return text
 
         except Exception as e:
@@ -67,6 +71,7 @@ class TranscriptionService:
 def get_transcription_service() -> TranscriptionService:
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
     MODEL_NAME = os.getenv("GEMINI_MODEL") or "gemini-2.5-flash"
+    WHISPER_MODEL = os.getenv("WHISPER_MODEL") or "base"
 
     if not GEMINI_API_KEY:
         print("Please provide GEMINI_API_KEY")
@@ -74,4 +79,8 @@ def get_transcription_service() -> TranscriptionService:
             "Required environment variable 'GEMINI_API_KEY' is not set."
         )
 
-    return TranscriptionService(gemini_api_key=GEMINI_API_KEY, gemini_model=MODEL_NAME)
+    return TranscriptionService(
+        gemini_api_key=GEMINI_API_KEY,
+        gemini_model=MODEL_NAME,
+        whisper_model=WHISPER_MODEL,
+    )

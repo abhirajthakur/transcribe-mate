@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.121.2",
+    "faster-whisper>=1.2.1",
     "google-genai>=1.50.1",
     "python-dotenv>=1.2.1",
 ]
