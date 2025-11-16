@@ -1,12 +1,14 @@
 import os
 import tempfile
 
+from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from services import transcription
 
+load_dotenv()
 
 class CleanRequest(BaseModel):
     text: str
@@ -15,9 +17,11 @@ class CleanRequest(BaseModel):
 
 app = FastAPI(title="transcribe-mate")
 
+FRONTEND_URL = os.getenv("FRONTEND_URL") or "http://localhost:3000"
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[FRONTEND_URL],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

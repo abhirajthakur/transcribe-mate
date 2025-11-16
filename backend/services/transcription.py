@@ -17,7 +17,7 @@ class TranscriptionService:
     def __init__(self, gemini_api_key: str, gemini_model: str, whisper_model: str):
         self.client = genai.Client(api_key=gemini_api_key)
         self.model = gemini_model
-        self.whisper = WhisperModel(whisper_model, device="auto", compute_type="int16")
+        self.whisper = WhisperModel(whisper_model, device="auto", compute_type="int8")
 
         try:
             self.client.models.list()
