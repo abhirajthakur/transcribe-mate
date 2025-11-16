@@ -27,7 +27,7 @@ class TranscriptionService:
 
     def transcribe(self, audio_file: str):
         print("Transcribing...")
-        segments, info = self.whisper.transcribe(audio_file, beam_size=5, language="en")
+        segments, info = self.whisper.transcribe(audio_file, beam_size=5)
 
         print(
             "Detected language '%s' with probability %f"
