@@ -9,12 +9,14 @@ interface CleanSectionProps {
   onClean: (customPrompt?: string) => void;
   isLoading: boolean;
   isDisabled: boolean;
+  systemPrompt: string;
 }
 
 export default function CleanSection({
   onClean,
   isLoading,
   isDisabled,
+  systemPrompt,
 }: CleanSectionProps) {
   const [customPrompt, setCustomPrompt] = useState("");
   const [showCustom, setShowCustom] = useState(false);
@@ -40,6 +42,18 @@ export default function CleanSection({
             <Wand2 className="w-4 h-4 text-orange-400" />
             <h3 className="text-white font-semibold">Custom Cleaning Prompt</h3>
           </div>
+
+          {systemPrompt && (
+            <div className="mb-3 p-3 bg-slate-700 rounded border border-slate-600">
+              <p className="text-xs text-slate-400 mb-1 font-semibold">
+                Current Prompt:
+              </p>
+              <p className="text-sm text-slate-300 line-clamp-3">
+                {systemPrompt}
+              </p>
+            </div>
+          )}
+
           <Button
             onClick={() => setShowCustom(true)}
             disabled={isLoading || isDisabled}

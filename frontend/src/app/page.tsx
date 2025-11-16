@@ -1,7 +1,7 @@
 "use client";
 
 import { Wand2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CleanSection from "@/components/clean-section";
 import PasteSection from "@/components/paste-section";
 import RecordingSection from "@/components/recording-section";
@@ -17,6 +17,24 @@ export default function Home() {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [isCleaning, setIsCleaning] = useState(false);
   const [error, setError] = useState("");
+  const [systemPrompt, setSystemPrompt] = useState("");
+
+  useEffect(() => {
+    console.log("CLICKED");
+    const fetchSystemPrompt = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/system-prompt`);
+        if (response.ok) {
+          const data = await response.json();
+          setSystemPrompt(data.default_prompt || "");
+        }
+      } catch (err) {
+        console.error("Failed to fetch system prompt:", err);
+      }
+    };
+
+    fetchSystemPrompt();
+  }, []);
 
   const handleTranscript = (text: string) => {
     setTranscript(text);
@@ -119,6 +137,7 @@ export default function Home() {
                   onClean={handleClean}
                   isLoading={isCleaning}
                   isDisabled={isDisabled}
+                  systemPrompt={systemPrompt}
                 />
 
                 {/* Cleaned Transcript - appears after cleaning */}
