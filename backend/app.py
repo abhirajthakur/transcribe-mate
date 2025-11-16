@@ -3,7 +3,6 @@ import tempfile
 
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from services import transcription
@@ -74,12 +73,10 @@ async def clean_text(
     ),
 ):
     try:
-        return StreamingResponse(
-            service.clean_with_llm_stream(
-                request.text, custom_system_prompt=request.system_prompt
-            ),
-            media_type="text/plain",
+        cleaned_text = service.clean_with_llm(
+            request.text, custom_system_prompt=request.system_prompt
         )
+        return {"cleaned": cleaned_text}
 
     except Exception as e:
         print(f"LLM cleaning error: {e}")

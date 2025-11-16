@@ -38,9 +38,9 @@ class TranscriptionService:
     def get_default_system_prompt(self):
         return SYSTEM_PROMPT
 
-    def clean_with_llm_stream(
+    def clean_with_llm(
         self, text: str, custom_system_prompt: Optional[str] = None
-    ):
+    ) -> str:
         if custom_system_prompt:
             prompt_to_use = custom_system_prompt
         else:
@@ -49,19 +49,19 @@ class TranscriptionService:
         print("Cleaning with LLM...")
 
         try:
-            response = self.client.models.generate_content_stream(
+            response = self.client.models.generate_content(
                 model=self.model,
                 config=types.GenerateContentConfig(system_instruction=prompt_to_use),
                 contents=text,
             )
+            if response.text:
+                return response.text
 
-            for chunk in response:
-                if chunk.text:
-                    yield chunk.text
+            return text
 
         except Exception as e:
-            print(f"LLM streaming error: {e}")
-            yield text
+            print(f"LLM error: {e}")
+            return text
 
 
 def get_transcription_service() -> TranscriptionService:

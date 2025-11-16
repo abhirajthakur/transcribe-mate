@@ -40,11 +40,11 @@ export default function Home() {
     setError("");
 
     try {
-      const payload: { transcript: string; customPrompt?: string } = {
-        transcript,
+      const payload: { text: string; system_prompt?: string } = {
+        text: transcript,
       };
       if (customPrompt) {
-        payload.customPrompt = customPrompt;
+        payload.system_prompt = customPrompt;
       }
 
       const response = await fetch(`${BACKEND_URL}/api/clean`, {
@@ -57,40 +57,8 @@ export default function Home() {
         throw new Error("Cleaning failed");
       }
 
-      const contentType = response.headers.get("content-type");
-      if (contentType?.includes("text/event-stream")) {
-        const reader = response.body?.getReader();
-        if (!reader) {
-          throw new Error("No stream reader");
-        }
-
-        let fullText = "";
-        const decoder = new TextDecoder();
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value);
-          const lines = chunk.split("\n");
-
-          for (const line of lines) {
-            if (line.startsWith("data: ")) {
-              const data = JSON.parse(line.slice(6));
-              if (data.chunk) {
-                fullText += data.chunk;
-              }
-            }
-          }
-        }
-
-        setCleanedTranscript(fullText);
-      } else {
-        // Handle regular JSON response
-        const data = await response.json();
-        setCleanedTranscript(data.cleaned);
-      }
-
+      const data = await response.json();
+      setCleanedTranscript(data.cleaned);
       setShowCleaned(true);
     } catch (err) {
       setError("Failed to clean transcript");

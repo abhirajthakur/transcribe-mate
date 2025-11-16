@@ -58,8 +58,12 @@ export default function RecordingSection({
 
   const transcribeAudio = async (blob: Blob) => {
     try {
+      const file = new File([blob], "audio.webm", {
+        type: blob.type || "audio/webm",
+      });
+
       const formData = new FormData();
-      formData.append("audio", blob);
+      formData.append("audio", file);
 
       const response = await fetch(`${BACKEND_URL}/api/transcribe`, {
         method: "POST",
